@@ -10,13 +10,18 @@ const kSampleIcons = [
   Icons.add_to_home_screen_outlined,
   Icons.account_box_outlined,
 ];
-const kSampleIconLabels = [
-  'Khuyến mãi',
-  'Lịch sử',
-  'Chuyển tiền',
-  'Nạp tiền',
-  'Tài khoản',
-];
+
+final kFlatButtonStyle = ButtonStyle(
+  shape: MaterialStateProperty.all<OutlinedBorder>(CircleBorder(
+    side: BorderSide(color: Colors.transparent),
+  )),
+  padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+  elevation: MaterialStateProperty.all<double>(0),
+  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+  backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+  overlayColor: MaterialStateProperty.all<Color>(Colors.black26),
+  minimumSize: MaterialStateProperty.all<Size>(Size.zero),
+);
 
 class MyApp extends StatefulWidget {
   @override
@@ -24,8 +29,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final controller = ScrollController();
-  double headerOffset = 0.0;
+  int index = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -35,34 +39,48 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.red,
       ),
       home: Scaffold(
-        body: Container(
-          margin: const EdgeInsets.only(top: 24.0),
-          child: Column(
+        body: SafeArea(
+          child: Stack(
             children: [
-              Expanded(
-                child: Container(
-                  color: Colors.white,
-                  child: SingleChildScrollView(
-                    controller: controller,
-                    child: Column(
-                      children: [
-                        Container(
-                          height: headerOffset,
-                        ),
-                        Image.asset('assets/sample.jpg'),
-                        Container(
-                          height: 350,
-                          color: Colors.white,
-                        ),
-                      ],
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/sample.jpg',
                     ),
-                  ),
+                    Image.network(
+                      'https://cdn.wallpapersafari.com/66/30/ez6LG9.jpg',
+                      fit: BoxFit.fitHeight,
+                      alignment: Alignment(0.7, 0.0),
+                      height: 1200,
+                    ),
+                  ],
                 ),
+              ),
+              Align(
+                child: RoundedBottomNavigationBar(
+                  currentIndex: index,
+                  length: kSampleIcons.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ElevatedButton(
+                      child: Icon(
+                        kSampleIcons[index],
+                        color: Colors.orangeAccent,
+                      ),
+                      style: kFlatButtonStyle,
+                      onPressed: () {
+                        setState(() {
+                          this.index = index;
+                        });
+                      },
+                    );
+                  },
+                ),
+                alignment: Alignment.bottomCenter,
               ),
             ],
           ),
         ),
-        bottomNavigationBar: RoundedBottomNavigationBar(),
       ),
     );
   }
