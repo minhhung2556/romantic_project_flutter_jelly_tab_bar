@@ -11,18 +11,6 @@ const kSampleIcons = [
   Icons.account_box_outlined,
 ];
 
-final kFlatButtonStyle = ButtonStyle(
-  shape: MaterialStateProperty.all<OutlinedBorder>(CircleBorder(
-    side: BorderSide(color: Colors.transparent),
-  )),
-  padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
-  elevation: MaterialStateProperty.all<double>(0),
-  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-  backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-  overlayColor: MaterialStateProperty.all<Color>(Colors.black26),
-  minimumSize: MaterialStateProperty.all<Size>(Size.zero),
-);
-
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
@@ -65,9 +53,22 @@ class _MyAppState extends State<MyApp> {
                     return ElevatedButton(
                       child: Icon(
                         kSampleIcons[index],
-                        color: Colors.orangeAccent,
                       ),
-                      style: kFlatButtonStyle,
+                      style: ButtonStyle(
+                        shape: MaterialStateProperty.all<OutlinedBorder>(
+                            CircleBorder(
+                          side: BorderSide(color: Colors.transparent),
+                        )),
+                        padding: MaterialStateProperty.all<EdgeInsets>(
+                            EdgeInsets.all(12)),
+                        elevation: MaterialStateProperty.all<double>(0),
+                        tapTargetSize: MaterialTapTargetSize.padded,
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.deepOrangeAccent),
+                        overlayColor:
+                            MaterialStateProperty.all<Color>(Colors.black26),
+                        minimumSize: MaterialStateProperty.all<Size>(Size.zero),
+                      ),
                       onPressed: () {
                         setState(() {
                           this.index = index;

@@ -11,7 +11,7 @@ class RoundedBottomNavigationBar extends StatefulWidget {
 
   const RoundedBottomNavigationBar({
     Key? key,
-    this.animationDuration: const Duration(milliseconds: 200),
+    this.animationDuration: const Duration(milliseconds: 400),
     this.currentIndex: 0,
     this.length: 0,
     required this.itemBuilder,
@@ -58,6 +58,7 @@ class _RoundedBottomNavigationBarState extends State<RoundedBottomNavigationBar>
         });
       }
     });
+    _animationController.forward();
     super.initState();
   }
 
@@ -85,9 +86,9 @@ class _RoundedBottomNavigationBarState extends State<RoundedBottomNavigationBar>
               (index) => widget.currentIndex == index
                   ? Transform.translate(
                       offset: Tween<Offset>(
-                              begin: Offset(0, -widget.height / 4),
-                              end: Offset.zero)
-                          .chain(CurveTween(curve: Curves.bounceOut))
+                              begin: Offset.zero,
+                              end: Offset(0, -widget.height / 10))
+                          .chain(CurveTween(curve: widget.animationCurve))
                           .transform(_animationController.value),
                       child: widget.itemBuilder(context, index),
                     )
@@ -113,7 +114,7 @@ class _RoundedBottomNavigationBarDecoration extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final partW = size.width / 5;
     final verticalPadding = 2.0;
-    final partCount = 16;
+    final partCount = 4;
     final partCountHalf = partCount / 2;
     final partSize = size.height / partCount;
 
