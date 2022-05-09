@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_rounded_bottom_navigation_bar:
+  flutter_liquid_tab_bar:
     path: ../
 
 dev_dependencies:

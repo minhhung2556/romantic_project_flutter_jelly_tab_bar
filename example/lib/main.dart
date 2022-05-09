@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rounded_bottom_navigation_bar/flutter_rounded_bottom_navigation_bar.dart';
+import 'package:flutter_liquid_tab_bar/flutter_liquid_tab_bar.dart';
 
 void main() => runApp(MyApp());
 
@@ -8,7 +8,7 @@ const kSampleIcons = [
   Icons.receipt_long_outlined,
   Icons.wifi_protected_setup_outlined,
   Icons.add_to_home_screen_outlined,
-  Icons.account_box_outlined,
+  Icons.ac_unit,
 ];
 
 class MyApp extends StatefulWidget {
@@ -17,8 +17,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  int index = 0;
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,57 +25,16 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.red,
       ),
       home: Scaffold(
-        body: SafeArea(
-          child: Stack(
+        body: SingleChildScrollView(
+          child: Column(
             children: [
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Image.asset(
-                      'assets/sample.jpg',
-                    ),
-                    Image.network(
-                      'https://cdn.wallpapersafari.com/66/30/ez6LG9.jpg',
-                      fit: BoxFit.fitHeight,
-                      alignment: Alignment(0.7, 0.0),
-                      height: 1200,
-                    ),
-                  ],
-                ),
+              Image.network(
+                'https://instagram.fsgn5-3.fna.fbcdn.net/v/t51.2885-15/266328155_657743085680956_4425133777659077551_n.jpg?stp=dst-jpg_e35_p750x750_sh0.08&_nc_ht=instagram.fsgn5-3.fna.fbcdn.net&_nc_cat=104&_nc_ohc=wA1j7GahQVcAX8qTPi7&tn=_-ysDAfzeH5aYFle&edm=ALQROFkBAAAA&ccb=7-4&ig_cache_key=MjcyNzcxODkzNjM2NTA2NjE4MQ%3D%3D.2-ccb7-4&oh=00_AT8gsOvTULTnxxxCyxHdMGOciR-nXnyGVPCCiDchyovBmQ&oe=627F72C2&_nc_sid=30a2ef',
+                fit: BoxFit.fitHeight,
+                height: 800,
               ),
-              Align(
-                child: RoundedBottomNavigationBar(
-                  currentIndex: index,
-                  length: kSampleIcons.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ElevatedButton(
-                      child: Icon(
-                        kSampleIcons[index],
-                      ),
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all<OutlinedBorder>(
-                            CircleBorder(
-                          side: BorderSide(color: Colors.transparent),
-                        )),
-                        padding: MaterialStateProperty.all<EdgeInsets>(
-                            EdgeInsets.all(12)),
-                        elevation: MaterialStateProperty.all<double>(0),
-                        tapTargetSize: MaterialTapTargetSize.padded,
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            Colors.deepOrangeAccent),
-                        overlayColor:
-                            MaterialStateProperty.all<Color>(Colors.black26),
-                        minimumSize: MaterialStateProperty.all<Size>(Size.zero),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          this.index = index;
-                        });
-                      },
-                    );
-                  },
-                ),
-                alignment: Alignment.bottomCenter,
+              LiquidTabBar(
+                tabs: kSampleIcons.map((e) => Icon(e)).toList(),
               ),
             ],
           ),
