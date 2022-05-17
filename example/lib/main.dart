@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_liquid_tab_bar/flutter_liquid_tab_bar.dart';
+import 'package:flutter_jelly_tab_bar/flutter_jelly_tab_bar.dart';
 
 void main() => runApp(MyApp());
 
@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> {
                 ),
               ],
             ),
-            LiquidTabBar(
+            JellyTabBar(
               margin: EdgeInsets.all(16),
               tabs: kSampleIcons.map((e) => Icon(e)).toList(),
             ),

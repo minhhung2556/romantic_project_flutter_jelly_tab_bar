@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LiquidTabBar extends StatefulWidget {
+class JellyTabBar extends StatefulWidget {
   final Duration animationDuration;
   final Curve animationCurve;
   final Color backgroundColor;
@@ -18,7 +18,7 @@ class LiquidTabBar extends StatefulWidget {
   /// will be used.
   final TabController? controller;
 
-  const LiquidTabBar({
+  const JellyTabBar({
     Key? key,
     required this.tabs,
     this.animationDuration: const Duration(milliseconds: 1600),
@@ -35,10 +35,10 @@ class LiquidTabBar extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _LiquidTabBarState createState() => _LiquidTabBarState();
+  _JellyTabBarState createState() => _JellyTabBarState();
 }
 
-class _LiquidTabBarState extends State<LiquidTabBar>
+class _JellyTabBarState extends State<JellyTabBar>
     with TickerProviderStateMixin {
   late final AnimationController _animationController;
   TabController? _tabController;
@@ -64,7 +64,7 @@ class _LiquidTabBarState extends State<LiquidTabBar>
   }
 
   @override
-  void didUpdateWidget(covariant LiquidTabBar oldWidget) {
+  void didUpdateWidget(covariant JellyTabBar oldWidget) {
     if (widget.animationDuration != oldWidget.animationDuration) {
       _animationController.duration = widget.animationDuration;
     }

@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_liquid_tab_bar:
+  flutter_jelly_tab_bar:
     path: ../
 
 dev_dependencies:
