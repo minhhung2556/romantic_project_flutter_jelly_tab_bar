@@ -62,7 +62,7 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_rounded_bottom_navigation_bar:
+  flutter_jelly_tab_bar:
     dependency: "direct main"
     description:
       path: ".."

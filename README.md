@@ -1,6 +1,6 @@
-# Flutter Romantic Rounded Bottom Navigation Bar
+# Flutter Romantic Bottom Jelly Tab Bar
 
-A Flutter package to create a Romantic Rounded Bottom Navigation Bar. It will be useful for your awesome app.
+A Flutter package to create a Romantic Bottom Jelly Tab Bar. It will be useful for your awesome app.
 
 This is a present from Romantic Project. More from [Romantic Developer](https://pub.dev/publishers/romanticdeveloper.com/packages)
 
@@ -10,9 +10,55 @@ This is a present from Romantic Project. More from [Romantic Developer](https://
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_rounded_bottom_navigation_bar/flutter_rounded_bottom_navigation_bar.dart';
+import 'package:flutter_jelly_tab_bar/flutter_jelly_tab_bar.dart';
 
-//TODO
+void main() => runApp(MyApp());
+
+const kSampleIcons = [
+  Icons.track_changes_outlined,
+  Icons.receipt_long_outlined,
+  Icons.wifi_protected_setup_outlined,
+  Icons.add_to_home_screen_outlined,
+];
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Example',
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+      ),
+      home: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Column(
+              children: [
+                Expanded(
+                  child: Image.asset(
+                    'assets/a.jpeg',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
+            ),
+            JellyTabBar(
+              margin: EdgeInsets.all(16),
+              tabs: kSampleIcons.map((e) => Icon(e)).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 ```
 
 ### Development environment
