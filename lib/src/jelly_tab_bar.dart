@@ -3,16 +3,56 @@ import 'package:flutter/material.dart';
 const _kAnimationCurve = Curves.bounceOut;
 const _kBouncingGap = 0.8;
 
+/// This is an example of [JellyTabBar] widget.
+///
+/// {@tool snippet}
+/// ```dart
+///   JellyTabBar(
+///     margin: EdgeInsets.all(16),
+///     animationDuration: const Duration(milliseconds: 1600),
+///     backgroundColor: const Color(0xff070606),
+///     activeColor: const Color(0xff83181D),
+///     iconColor: Colors.white,
+///     height: 72.0,
+///     padding: const EdgeInsets.only(
+///         bottom: 12.0, top: 12.0, left: 12.0, right: 12.0),
+///     borderRadius: 36,
+///     tabItemPadding: const EdgeInsets.all(8),
+///     bounceFactor: 0.3,
+///     tabs: kSampleIcons.map((e) => Icon(e)).toList(),
+///   ),
+/// ```
+/// {@end-tool}
 class JellyTabBar extends StatefulWidget {
-  final Duration animationDuration;
+  /// [duration] : The duration to run animation.
+  final Duration duration;
+
+  /// [backgroundColor] : The background color of the tab bar.
   final Color backgroundColor;
+
+  /// [height] : The height of the tab bar.
   final double height;
+
+  /// [margin] : The margin of the tab bar.
   final EdgeInsets margin;
+
+  /// [padding] : The padding of the tab bar background.
   final EdgeInsets padding;
+
+  /// [borderRadius] : The border radius of the tab bar background.
   final double borderRadius;
+
+  /// [activeColor] : The active icon color.
   final Color activeColor;
+
+  /// [iconColor] : The icon color.
   final Color iconColor;
+
+  /// [tabs] : They should be icon/image widgets without action.
   final List<Widget> tabs;
+
+  /// [tabItemPadding] : is the padding of the icon widget inside each [tabs].
+  final EdgeInsets tabItemPadding;
 
   /// This widget's selection and animation state.
   ///
@@ -20,14 +60,11 @@ class JellyTabBar extends StatefulWidget {
   /// will be used.
   final TabController? controller;
 
-  final EdgeInsets tabItemPadding;
-
-  final double bounceFactor;
-
+  /// Create a Romantic Bottom Jelly TabBar.
   const JellyTabBar({
     Key? key,
     required this.tabs,
-    this.animationDuration: const Duration(milliseconds: 1600),
+    this.duration: const Duration(milliseconds: 1600),
     this.backgroundColor: const Color(0xff070606),
     this.activeColor: const Color(0xff83181D),
     this.iconColor: Colors.white,
@@ -38,7 +75,6 @@ class JellyTabBar extends StatefulWidget {
     this.borderRadius: 36,
     this.controller,
     this.tabItemPadding: const EdgeInsets.all(8),
-    this.bounceFactor: 0.3,
   }) : super(key: key);
 
   @override
@@ -55,7 +91,7 @@ class _JellyTabBarState extends State<JellyTabBar>
   @override
   void initState() {
     _animationController =
-        AnimationController(vsync: this, duration: widget.animationDuration);
+        AnimationController(vsync: this, duration: widget.duration);
     _animationController.addListener(() {
       setState(() {});
     });
@@ -74,8 +110,8 @@ class _JellyTabBarState extends State<JellyTabBar>
 
   @override
   void didUpdateWidget(covariant JellyTabBar oldWidget) {
-    if (widget.animationDuration != oldWidget.animationDuration) {
-      _animationController.duration = widget.animationDuration;
+    if (widget.duration != oldWidget.duration) {
+      _animationController.duration = widget.duration;
     }
     if (widget.controller != null && _tabController != oldWidget.controller) {
       _tabController = widget.controller!;
@@ -102,7 +138,7 @@ class _JellyTabBarState extends State<JellyTabBar>
       height: widget.height,
       child: CustomPaint(
         painter: _RoundedBottomNavigationBarDecoration(
-          bounceFactor: widget.bounceFactor,
+          bounceFactor: 0.3,
           bezierHorizontalPartCount: 12,
           bezierVerticalPartCount: 6,
           relativeQuadraticBezierMap: [
