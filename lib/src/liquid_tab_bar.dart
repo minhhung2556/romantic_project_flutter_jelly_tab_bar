@@ -4,7 +4,7 @@ class LiquidTabBar extends StatefulWidget {
   final Duration animationDuration;
   final Curve animationCurve;
   final Color backgroundColor;
-  final double minHeight;
+  final double height;
   final EdgeInsets margin;
   final EdgeInsets padding;
   final double borderRadius;
@@ -23,10 +23,10 @@ class LiquidTabBar extends StatefulWidget {
     required this.tabs,
     this.animationDuration: const Duration(milliseconds: 1600),
     this.animationCurve: Curves.bounceOut,
-    this.backgroundColor: const Color(0xff171c26),
-    this.activeColor: const Color(0xffff7847),
+    this.backgroundColor: const Color(0xff070606),
+    this.activeColor: const Color(0xff83181D),
     this.iconColor: Colors.white,
-    this.minHeight: 64.0,
+    this.height: 64.0,
     this.margin: EdgeInsets.zero,
     this.padding:
         const EdgeInsets.only(bottom: 12.0, top: 12.0, left: 12.0, right: 12.0),
@@ -41,7 +41,7 @@ class LiquidTabBar extends StatefulWidget {
 class _LiquidTabBarState extends State<LiquidTabBar>
     with TickerProviderStateMixin {
   late final AnimationController _animationController;
-  late final TabController _tabController;
+  TabController? _tabController;
   late Tween<double> _indexTween;
   @override
   void initState() {
@@ -60,7 +60,7 @@ class _LiquidTabBarState extends State<LiquidTabBar>
     _indexTween =
         Tween<double>(begin: oldIndex.toDouble(), end: newIndex.toDouble());
     _animationController.forward(from: 0);
-    _tabController.index = newIndex;
+    _tabController!.index = newIndex;
   }
 
   @override
@@ -70,6 +70,10 @@ class _LiquidTabBarState extends State<LiquidTabBar>
     }
     if (widget.controller != null && _tabController != oldWidget.controller) {
       _tabController = widget.controller!;
+    }
+    if (widget.tabs != oldWidget.tabs) {
+      _tabController = widget.controller ??
+          TabController(length: widget.tabs.length, vsync: this);
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -88,20 +92,35 @@ class _LiquidTabBarState extends State<LiquidTabBar>
       shadowColor: Colors.transparent,
       child: Container(
         margin: widget.margin,
-        constraints: BoxConstraints(minHeight: widget.minHeight),
+        height: widget.height,
         child: CustomPaint(
           painter: _RoundedBottomNavigationBarDecoration(
             bezierHorizontalPartCount: 12,
             bezierVerticalPartCount: 6,
             relativeQuadraticBezierMap: [
-              <double>[2, 0, 3, 2],
+              <double>[
+                2,
+                Tween<double>(begin: 1, end: 0)
+                    .chain(CurveTween(curve: widget.animationCurve))
+                    .evaluate(_animationController),
+                3,
+                Tween<double>(begin: 3, end: 2)
+                    .chain(CurveTween(curve: widget.animationCurve))
+                    .evaluate(_animationController)
+              ],
               <double>[1, 2, 3, 2],
               <double>[2, 0, 3, -2],
-              <double>[1, -2, 3, -2],
+              <double>[
+                1,
+                -2,
+                3,
+                Tween<double>(begin: -3, end: -2)
+                    .chain(CurveTween(curve: widget.animationCurve))
+                    .evaluate(_animationController)
+              ],
             ],
             borderRadius: Tween<Radius>(
-                    begin: Radius.elliptical(
-                        widget.borderRadius / 2, widget.borderRadius),
+                    begin: Radius.circular(widget.borderRadius * 1.4),
                     end: Radius.elliptical(
                         widget.borderRadius, widget.borderRadius))
                 .chain(CurveTween(curve: widget.animationCurve))
@@ -130,10 +149,10 @@ class _LiquidTabBarState extends State<LiquidTabBar>
   }
 
   Widget _itemBuilder(BuildContext context, int index) {
-    final selected = index == _tabController.index;
+    final selected = index == _tabController!.index;
     final child = ElevatedButton(
       onPressed: () {
-        _changeIndex(_tabController.index, index);
+        _changeIndex(_tabController!.index, index);
       },
       child: widget.tabs[index],
       style: ButtonStyle(
@@ -194,20 +213,24 @@ class _RoundedBottomNavigationBarDecoration extends CustomPainter {
     final reverseAnimationValue = 1 - animationValue;
     final bezierPartSizeVertical =
         (size.height - padding.vertical) / bezierVerticalPartCount;
-    final bezierPartSizeHorizontal =
-        (size.width - padding.horizontal) / length / bezierHorizontalPartCount;
-
+    final bezierPartSizeHorizontal = (size.width - padding.horizontal) /
+        (length / 2) /
+        bezierHorizontalPartCount;
+    final deltaRadius =
+        Radius.elliptical(0, reverseAnimationValue * borderRadius.y * 0.5);
     final path = Path()
       ..moveTo(
           padding.left +
-              currentIndex * ((size.width - padding.horizontal) / length),
-          0);
+              (currentIndex * (size.width - padding.horizontal) -
+                      bezierPartSizeHorizontal * bezierHorizontalPartCount) /
+                  length,
+          deltaRadius.y);
     for (var i = 0; i < relativeQuadraticBezierMap.length; ++i) {
       var bezier = relativeQuadraticBezierMap[i];
       var x1 = bezier[0];
-      var y1 = bezier[1];
+      var y1 = bezier[1] * reverseAnimationValue;
       var x2 = bezier[2];
-      var y2 = bezier[3];
+      var y2 = bezier[3] * reverseAnimationValue;
 
       if (i == 0) {
         x1 += -_kBouncingGap * reverseAnimationValue;
@@ -220,9 +243,9 @@ class _RoundedBottomNavigationBarDecoration extends CustomPainter {
       }
       path.relativeQuadraticBezierTo(
           x1 * bezierPartSizeHorizontal,
-          y1 * bezierPartSizeVertical * reverseAnimationValue,
+          y1 * bezierPartSizeVertical,
           x2 * bezierPartSizeHorizontal,
-          y2 * bezierPartSizeVertical * reverseAnimationValue);
+          y2 * bezierPartSizeVertical);
     }
 
     path
@@ -232,10 +255,11 @@ class _RoundedBottomNavigationBarDecoration extends CustomPainter {
       ..lineTo(0, 0);
 
     canvas.clipPath(path);
+
     canvas.drawRRect(
         RRect.fromLTRBAndCorners(0, 0, size.width, size.height,
-            topLeft: borderRadius,
-            topRight: borderRadius,
+            topLeft: borderRadius + deltaRadius,
+            topRight: borderRadius + deltaRadius,
             bottomLeft: borderRadius,
             bottomRight: borderRadius),
         Paint()..color = backgroundColor);
