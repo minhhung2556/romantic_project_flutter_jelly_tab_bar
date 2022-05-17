@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+const _kAnimationCurve = Curves.bounceOut;
+const _kBouncingGap = 0.8;
+
 class JellyTabBar extends StatefulWidget {
   final Duration animationDuration;
-  final Curve animationCurve;
   final Color backgroundColor;
   final double height;
   final EdgeInsets margin;
@@ -18,20 +20,25 @@ class JellyTabBar extends StatefulWidget {
   /// will be used.
   final TabController? controller;
 
+  final EdgeInsets tabItemPadding;
+
+  final double bounceFactor;
+
   const JellyTabBar({
     Key? key,
     required this.tabs,
     this.animationDuration: const Duration(milliseconds: 1600),
-    this.animationCurve: Curves.bounceOut,
     this.backgroundColor: const Color(0xff070606),
     this.activeColor: const Color(0xff83181D),
     this.iconColor: Colors.white,
-    this.height: 64.0,
+    this.height: 72.0,
     this.margin: EdgeInsets.zero,
     this.padding:
         const EdgeInsets.only(bottom: 12.0, top: 12.0, left: 12.0, right: 12.0),
-    this.borderRadius: 32,
+    this.borderRadius: 36,
     this.controller,
+    this.tabItemPadding: const EdgeInsets.all(8),
+    this.bounceFactor: 0.3,
   }) : super(key: key);
 
   @override
@@ -43,6 +50,8 @@ class _JellyTabBarState extends State<JellyTabBar>
   late final AnimationController _animationController;
   TabController? _tabController;
   late Tween<double> _indexTween;
+  final _curveTween = CurveTween(curve: _kAnimationCurve);
+
   @override
   void initState() {
     _animationController =
@@ -84,64 +93,60 @@ class _JellyTabBarState extends State<JellyTabBar>
     super.dispose();
   }
 
+  double get animationValue => _animationController.value;
+
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      elevation: 0.0,
-      shadowColor: Colors.transparent,
-      child: Container(
-        margin: widget.margin,
-        height: widget.height,
-        child: CustomPaint(
-          painter: _RoundedBottomNavigationBarDecoration(
-            bezierHorizontalPartCount: 12,
-            bezierVerticalPartCount: 6,
-            relativeQuadraticBezierMap: [
-              <double>[
-                2,
-                Tween<double>(begin: 1, end: 0)
-                    .chain(CurveTween(curve: widget.animationCurve))
-                    .evaluate(_animationController),
-                3,
-                Tween<double>(begin: 3, end: 2)
-                    .chain(CurveTween(curve: widget.animationCurve))
-                    .evaluate(_animationController)
-              ],
-              <double>[1, 2, 3, 2],
-              <double>[2, 0, 3, -2],
-              <double>[
-                1,
-                -2,
-                3,
-                Tween<double>(begin: -3, end: -2)
-                    .chain(CurveTween(curve: widget.animationCurve))
-                    .evaluate(_animationController)
-              ],
+    return Container(
+      margin: widget.margin,
+      height: widget.height,
+      child: CustomPaint(
+        painter: _RoundedBottomNavigationBarDecoration(
+          bounceFactor: widget.bounceFactor,
+          bezierHorizontalPartCount: 12,
+          bezierVerticalPartCount: 6,
+          relativeQuadraticBezierMap: [
+            <double>[
+              2,
+              Tween<double>(begin: 1, end: 0)
+                  .chain(_curveTween)
+                  .evaluate(_animationController),
+              3,
+              Tween<double>(begin: 3, end: 2)
+                  .chain(_curveTween)
+                  .evaluate(_animationController)
             ],
-            borderRadius: Tween<Radius>(
-                    begin: Radius.circular(widget.borderRadius * 1.4),
-                    end: Radius.elliptical(
-                        widget.borderRadius, widget.borderRadius))
-                .chain(CurveTween(curve: widget.animationCurve))
-                .evaluate(_animationController),
-            backgroundColor: widget.backgroundColor,
-            currentIndex: _indexTween
-                .chain(CurveTween(curve: widget.animationCurve))
-                .transform(_animationController.value),
-            animationValue: CurveTween(curve: widget.animationCurve)
-                .transform(_animationController.value),
-            length: widget.tabs.length,
-            padding: widget.padding,
-          ),
-          child: Padding(
-            padding: widget.padding,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: widget.tabs
-                  .map((e) => _itemBuilder(context, widget.tabs.indexOf(e)))
-                  .toList(),
-            ),
+            <double>[1, 2, 3, 2],
+            <double>[2, 0, 3, -2],
+            <double>[
+              1,
+              -2,
+              3,
+              Tween<double>(begin: -3, end: -2)
+                  .chain(_curveTween)
+                  .evaluate(_animationController)
+            ],
+          ],
+          borderRadius: Tween<Radius>(
+                  begin: Radius.circular(widget.borderRadius * 1.4),
+                  end: Radius.elliptical(
+                      widget.borderRadius, widget.borderRadius))
+              .chain(_curveTween)
+              .evaluate(_animationController),
+          backgroundColor: widget.backgroundColor,
+          currentIndex:
+              _indexTween.chain(_curveTween).transform(animationValue),
+          animationValue: _curveTween.transform(animationValue),
+          length: widget.tabs.length,
+          padding: widget.padding,
+        ),
+        child: Padding(
+          padding: widget.padding,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: widget.tabs
+                .map((e) => _itemBuilder(context, widget.tabs.indexOf(e)))
+                .toList(),
           ),
         ),
       ),
@@ -161,7 +166,7 @@ class _JellyTabBarState extends State<JellyTabBar>
             side: BorderSide(color: Colors.transparent),
           ),
         ),
-        padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(6)),
+        padding: MaterialStateProperty.all<EdgeInsets>(widget.tabItemPadding),
         elevation: MaterialStateProperty.all<double>(0),
         tapTargetSize: MaterialTapTargetSize.padded,
         backgroundColor: MaterialStateProperty.all<Color>(
@@ -175,15 +180,13 @@ class _JellyTabBarState extends State<JellyTabBar>
         ? Transform.translate(
             offset: Tween<Offset>(
                     begin: Offset(0, widget.padding.bottom), end: Offset.zero)
-                .chain(CurveTween(curve: widget.animationCurve))
-                .transform(_animationController.value),
+                .chain(_curveTween)
+                .transform(animationValue),
             child: child,
           )
         : child;
   }
 }
-
-const _kBouncingGap = 1;
 
 class _RoundedBottomNavigationBarDecoration extends CustomPainter {
   final Color backgroundColor;
@@ -195,6 +198,7 @@ class _RoundedBottomNavigationBarDecoration extends CustomPainter {
   final double animationValue;
   final int length;
   final EdgeInsets padding;
+  final double bounceFactor;
 
   const _RoundedBottomNavigationBarDecoration({
     required this.backgroundColor,
@@ -206,7 +210,8 @@ class _RoundedBottomNavigationBarDecoration extends CustomPainter {
     required this.length,
     required this.padding,
     required this.animationValue,
-  });
+    required this.bounceFactor,
+  }) : assert(bounceFactor >= 0.1 && bounceFactor <= 1);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -216,8 +221,8 @@ class _RoundedBottomNavigationBarDecoration extends CustomPainter {
     final bezierPartSizeHorizontal = (size.width - padding.horizontal) /
         (length / 2) /
         bezierHorizontalPartCount;
-    final deltaRadius =
-        Radius.elliptical(0, reverseAnimationValue * borderRadius.y * 0.5);
+    final deltaRadius = Radius.elliptical(
+        0, reverseAnimationValue * borderRadius.y * bounceFactor);
     final path = Path()
       ..moveTo(
           padding.left +
@@ -266,8 +271,19 @@ class _RoundedBottomNavigationBarDecoration extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    //TODO
-    return true;
+  bool shouldRepaint(
+      covariant _RoundedBottomNavigationBarDecoration oldDelegate) {
+    return oldDelegate.backgroundColor != this.backgroundColor ||
+        oldDelegate.relativeQuadraticBezierMap !=
+            this.relativeQuadraticBezierMap ||
+        oldDelegate.bezierVerticalPartCount != this.bezierVerticalPartCount ||
+        oldDelegate.bezierHorizontalPartCount !=
+            this.bezierHorizontalPartCount ||
+        oldDelegate.borderRadius != this.borderRadius ||
+        oldDelegate.currentIndex != this.currentIndex ||
+        oldDelegate.length != this.length ||
+        oldDelegate.padding != this.padding ||
+        oldDelegate.animationValue != this.animationValue ||
+        oldDelegate.bounceFactor != this.bounceFactor;
   }
 }
